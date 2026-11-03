@@ -6,6 +6,7 @@ Automating Bentley SACS, Delft3D/MIKE 21 Structures, Metocean Fetchers, and Grap
 
 import argparse
 import sys
+import subprocess
 from pathlib import Path
 
 
@@ -67,13 +68,35 @@ def main():
     p_tripod.add_argument("-o", "--output", default="sacinp.tripod", help="Output SACS input file")
 
     # 8. sacs-precede
-    p_precede = subparsers.add_parser("sacs-precede", help="Launch SACS Precede 3D modeler safely detached")
+    subparsers.add_parser("sacs-precede", help="Launch SACS Precede 3D modeler safely detached")
+
+    # 9. nc2excel (CLI)
+    p_nc2xl = subparsers.add_parser("nc2excel", help="Extract Metocean NetCDF datasets to formatted multi-sheet Excel")
+    p_nc2xl.add_argument("--meteo-dir", required=True, help="Folder containing ERA5 wind .nc files")
+    p_nc2xl.add_argument("--wave-dir", required=True, help="Folder containing Copernicus wave .nc files")
+    p_nc2xl.add_argument("--lat", type=float, default=-8.00, help="Target Latitude")
+    p_nc2xl.add_argument("--lon", type=float, default=131.25, help="Target Longitude")
+    p_nc2xl.add_argument("-o", "--output", default="Metocean_Report.xlsx", help="Output Excel (.xlsx) file path")
+
+    # 10. nc2excel-gui
+    subparsers.add_parser("nc2excel-gui", help="Launch interactive GUI for NetCDF to Excel converter with 4-panel plot")
+
+    # 11. converter-gui
+    subparsers.add_parser("converter-gui", help="Launch Universal Document & Vector (WMF/PDF) Converter GUI")
+
+    # 12. pdf-turbo
+    subparsers.add_parser("pdf-turbo", help="Launch multi-threaded PDF to PNG Turbo Converter GUI")
+
+    # 13. wmf-gui
+    subparsers.add_parser("wmf-gui", help="Launch dedicated WMF/EMF Vector Converter GUI")
 
     args = parser.parse_args()
 
     if not args.command:
         parser.print_help()
         sys.exit(0)
+
+    curr_dir = Path(__file__).resolve().parent
 
     if args.command == "wmf2png":
         from converters import convert_wmf_via_gdiplus, batch_convert_wmf
@@ -141,6 +164,36 @@ def main():
             print("[+] SACS Precede launched successfully in detached mode.")
         else:
             print("[-] Could not launch Precede.")
+
+    elif args.command == "nc2excel":
+        from metocean import export_netcdf_to_excel
+        export_netcdf_to_excel(
+            meteo_dir=args.meteo_dir,
+            wave_dir=args.wave_dir,
+            output_excel=args.output,
+            target_lat=args.lat,
+            target_lon=args.lon
+        )
+
+    elif args.command == "nc2excel-gui":
+        script_path = curr_dir / "metocean" / "MetoceanNcToExcelApp.py"
+        subprocess.Popen([sys.executable, str(script_path)])
+        print("[+] Launched Metocean NetCDF to Excel Interactive GUI.")
+
+    elif args.command == "converter-gui":
+        script_path = curr_dir / "converters" / "UniversalConverterApp.py"
+        subprocess.Popen([sys.executable, str(script_path)])
+        print("[+] Launched Universal Document & Vector Converter GUI.")
+
+    elif args.command == "pdf-turbo":
+        script_path = curr_dir / "converters" / "PdfToPngTurboApp.py"
+        subprocess.Popen([sys.executable, str(script_path)])
+        print("[+] Launched PDF to PNG Turbo Converter GUI.")
+
+    elif args.command == "wmf-gui":
+        script_path = curr_dir / "converters" / "WmfToPngConverterApp.py"
+        subprocess.Popen([sys.executable, str(script_path)])
+        print("[+] Launched WMF/EMF Vector to PNG Converter GUI.")
 
 
 if __name__ == "__main__":

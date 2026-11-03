@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=for-the-badge)](https://github.com/Asikraam/ocean-engineering-toolkit)
 
-Kumpulan skrip dan modul automasi Python praktis untuk menunjang pekerjaan **Ocean, Coastal, and Offshore Engineering**. Didesain untuk mempercepat alur kerja harian: dari konversi gambar grafik teknis resolusi tinggi, penarikan data batimetri/metocean tanpa browser, hingga generator model struktur Bentley SACS dan pemodelan numerik Delft3D / MIKE 21.
+Kumpulan skrip dan modul automasi Python praktis untuk menunjang pekerjaan **Ocean, Coastal, and Offshore Engineering**. Didesain untuk mempercepat alur kerja harian: dari konversi gambar grafik teknis resolusi tinggi, ekstraksi data NetCDF ke Excel terformat, penarikan data batimetri/metocean tanpa browser, hingga generator model struktur Bentley SACS dan pemodelan numerik Delft3D / MIKE 21.
 
 > [!TIP]
 > **Tidak punya akun GitHub?** Kamu tidak perlu login sama sekali. Cukup klik tombol hijau **[Download ZIP Source Code](https://github.com/Asikraam/ocean-engineering-toolkit/archive/refs/heads/main.zip)** di atas untuk langsung mengunduh seluruh file ke komputermu.
@@ -16,31 +16,33 @@ Kumpulan skrip dan modul automasi Python praktis untuk menunjang pekerjaan **Oce
 
 ```mermaid
 flowchart TD
-    subgraph INPUT ["Input Teknis & Koordinat"]
-        A["File SACS (.wmf / .emf / .pdf)"]
-        B["Koordinat BBox Wilayah (Lon, Lat)"]
-        C["Tata Letak Tiang Pancang (X, Y, Dia)"]
-        D["Parameter Geometri Jacket"]
+    subgraph INPUT ["Input Teknis, Data & Koordinat"]
+        A["File CAD / SACS (.wmf / .emf / .pdf)"]
+        B["File Reanalisis NetCDF (.nc) Angin & Gelombang"]
+        C["Koordinat BBox Wilayah (Lon, Lat)"]
+        D["Tata Letak Tiang Pancang & Jacket"]
     end
 
     subgraph TOOLKIT ["Ocean Engineering Toolkit"]
-        M1["converters/<br>High-DPI Vector Rasterizer"]
-        M2["metocean/<br>Headless DEMNAS & ERA5 Fetcher"]
+        M1["converters/<br>High-DPI Vector & PDF Studio<br>(GUI & CLI)"]
+        M2["metocean/<br>NetCDF to Excel Engine &<br>Headless DEMNAS/ERA5 Fetcher"]
         M3["hydro/<br>Delft3D & MIKE 21 Structure Engine"]
         M4["sacs/<br>80-Column Card Generator & Launcher"]
     end
 
     subgraph OUTPUT ["Output Siap Pakai"]
         O1["Gambar PNG Tajam 300+ DPI (Word/LaTeX)"]
-        O2["Batimetri XYZ & Reanalisis Gelombang .nc"]
-        O3["Thin Dam .thd & Pile Resistance MIKE 21"]
-        O4["Input Model sacinp.* & SACS Precede 3D"]
+        O2["Laporan Excel (.xlsx) Multi-Sheet & Plot 4-Panel"]
+        O3["Batimetri XYZ & Reanalisis Gelombang .nc"]
+        O4["Thin Dam .thd & Pile Resistance MIKE 21"]
+        O5["Input Model sacinp.* & SACS Precede 3D"]
     end
 
     A --> M1 --> O1
     B --> M2 --> O2
-    C --> M3 --> O3
-    D --> M4 --> O4
+    C --> M2 --> O3
+    D --> M3 --> O4
+    D --> M4 --> O5
 ```
 
 ---
@@ -63,21 +65,30 @@ pip install -r requirements.txt
 
 ---
 
-## ⚡ Quick Start: 4 Perintah Paling Sering Digunakan
+## ⚡ Quick Start: Perintah yang Sering Digunakan
 
 Semua fungsi dapat dipanggil langsung melalui antarmuka perintah terpadu `cli.py`:
 
 ```bash
-# 1. Ubah grafik plot SACS/Precede (.wmf) jadi PNG tajam 300 DPI untuk laporan
+# 1. Buka Universal Converter Desktop Studio (WMF/EMF Vector & Multi-page PDF)
+python cli.py converter-gui
+
+# 2. Buka Metocean NetCDF to Excel Converter GUI (lengkap dengan grafik preview 4-panel)
+python cli.py nc2excel-gui
+
+# 3. Ekstrak NetCDF Angin & Gelombang langsung ke Excel via CLI (Headless)
+python cli.py nc2excel --meteo-dir ./data/Meteo_ERA5 --wave-dir ./data/Wave_Marine --lat -8.00 --lon 131.25 -o Metocean_Report.xlsx
+
+# 4. Ubah grafik plot SACS/Precede (.wmf) jadi PNG tajam 300 DPI untuk laporan
 python cli.py wmf2png gambar_sacs.wmf --dpi 300
 
-# 2. Download tile batimetri DEMNAS otomatis via koordinat tanpa buka Chrome
+# 5. Download tile batimetri DEMNAS otomatis via koordinat tanpa buka Chrome
 python cli.py demnas --bbox 106.6 -6.1 107.0 -5.8
 
-# 3. Hitung susunan tiang pancang & koefisien hambatan Delft3D FLOW
+# 6. Hitung susunan tiang pancang & koefisien hambatan Delft3D FLOW
 python cli.py delft-pile --nx 4 --ny 6 --dx 5.0 --dy 5.0 --dia 1.2
 
-# 4. Generate kartu SACS 3-Leg Tripod Jacket otomatis
+# 7. Generate kartu SACS 3-Leg Tripod Jacket otomatis
 python cli.py sacs-tripod --depth 45.0 --airgap 12.0
 ```
 
@@ -85,32 +96,36 @@ python cli.py sacs-tripod --depth 45.0 --airgap 12.0
 
 ## 📚 Rincian Modul & Cara Pakai Lengkap
 
-### 1. Document & Graphic Converters (`converters/`)
+### 1. Document & Graphic Converters Suite (`converters/`)
 Mengatasi masalah klasik grafik buram saat mengekspor visualisasi dari Bentley SACS / Precede ke dokumen Microsoft Word atau LaTeX:
-- **`wmf_converter.py`**: Menggunakan Windows GDI+ untuk merasterisasi file `.wmf` dan `.emf` menjadi PNG berkualitas publikasi (300 hingga 600 DPI) tanpa pecah/pixelated.
-- **`pdf_converter.py`**: Merasterisasi gambar teknik PDF per halaman secara cepat menggunakan Chromium PDFium engine.
+- **`UniversalConverterApp.py`**: Aplikasi GUI modern berantarmuka ganda (Dual Tab) untuk konversi vektor WMF/EMF Ultra-HD dan dokumen PDF beresolusi tinggi dengan dukungan tema gelap/terang otomatis.
+- **`PdfToPngTurboApp.py`**: Aplikasi GUI multi-threaded untuk rasterisasi PDF cepat, pemilihan rentang halaman (`1, 3-5, 10`), dan kontrol resolusi (150/300/600 DPI).
+- **`WmfToPngConverterApp.py`**: Aplikasi GUI khusus konversi vektor WMF/EMF dengan fitur transparansi background dan padding pixel.
+- **`wmf_converter.py` & `pdf_converter.py`**: Mesin rasterisasi backend berbasis Windows Native GDI+ dan PDFium.
 
 ```bash
-# Mengonversi seluruh isi folder berisi banyak file .wmf sekaligus:
-python cli.py wmf2png ./folder_grafik_sacs/ --dpi 300
+# Jalankan aplikasi Desktop GUI terpadu:
+python cli.py converter-gui
 
-# Mengonversi laporan drawing PDF ke gambar PNG:
-python cli.py pdf2png drawing_pelabuhan.pdf --dpi 300 -o ./output_gambar/
+# Atau jalankan konversi batch via CLI:
+python cli.py wmf2png ./folder_grafik_sacs/ --dpi 300
 ```
 
 ---
 
-### 2. Metocean & Bathymetry Fetcher (`metocean/`)
-Mengambil data oseanografi dan elevasi langsung ke disk tanpa proses klik manual di web:
+### 2. Metocean & Data Processing Suite (`metocean/`)
+Mengambil data oseanografi dan elevasi langsung ke disk serta mengonversi format NetCDF reanalisis ke laporan tabular profesional:
+- **`MetoceanNcToExcelApp.py`**: Aplikasi desktop GUI interaktif untuk memilih titik koordinat, mengekstrak data angin (ERA5) dan gelombang spektral (Copernicus Marine), serta menampilkan grafik preview 4-panel (kecepatan angin, arah angin, $H_s$, $T_p$).
+- **`MetoceanNcToExcelEngine.py`**: Mesin CLI headless untuk memproses dataset NetCDF ke laporan Microsoft Excel (`.xlsx`) multi-sheet terformat rapi (Ringkasan Statistik, Data Gabungan, Angin ERA5, Gelombang Marine) lengkap dengan styling OpenPyXL, zebra striping, dan freeze panes.
 - **`demnas.py`**: Menghitung Nomor Lembar Peta (NLP skala 1:50.000) berdasarkan bounding box koordinat geodetik, mengunduh tile DEMNAS secara *headless*, dan mengekspornya ke format ASCII XYZ (`.xyz`) untuk mesh pemodelan.
 - **`ecmwf_era5.py`**: Menghubungkan script ke Copernicus Climate Data Store (CDS API) untuk menarik data historis tinggi gelombang signifikan ($H_s$), periode ($T_p$), arah gelombang, dan angin 10 meter ($u_{10}, v_{10}$) dalam format NetCDF (`.nc`).
 
 ```bash
-# Menarik DEMNAS untuk wilayah pesisir tertentu:
-python cli.py demnas --bbox 106.5 -6.2 107.0 -5.8 -o ./demnas_tiles/
+# Jalankan GUI Metocean NetCDF to Excel:
+python cli.py nc2excel-gui
 
-# Menarik gelombang ERA5 satu bulan penuh:
-python cli.py era5 --years 2023 --months 1 --bbox 5.0 95.0 -11.0 141.0 -o era5_waves.nc
+# Ekstraksi NetCDF ke Excel via CLI:
+python cli.py nc2excel --meteo-dir ./data/Meteo_ERA5 --wave-dir ./data/Wave_Marine --lat -8.00 --lon 131.25 -o Laporan_Metocean.xlsx
 ```
 
 ---
@@ -143,12 +158,18 @@ python cli.py sacs-precede
 
 ```
 ocean-engineering-toolkit/
-├── converters/               # Modul konversi grafis & dokumen
-│   ├── wmf_converter.py
-│   └── pdf_converter.py
-├── metocean/                 # Modul unduh DEMNAS & ECMWF ERA5
-│   ├── demnas.py
-│   └── ecmwf_era5.py
+├── converters/               # Modul & Desktop GUI konversi grafis & dokumen
+│   ├── UniversalConverterApp.py   # Flagship 2-in-1 Vector & PDF Studio GUI
+│   ├── PdfToPngTurboApp.py        # Turbo Multi-threaded PDF Rasterizer GUI
+│   ├── WmfToPngConverterApp.py    # Dedicated WMF/EMF Vector Converter GUI
+│   ├── ConvertWmfToPng.ps1        # Windows GDI+ PowerShell backend
+│   ├── wmf_converter.py           # Backend engine WMF GDI+
+│   └── pdf_converter.py           # Backend engine PDFium
+├── metocean/                 # Modul pengolahan NetCDF & penarikan data geospasial
+│   ├── MetoceanNcToExcelApp.py    # Interactive GUI NetCDF to Excel + 4-panel preview
+│   ├── MetoceanNcToExcelEngine.py # Headless CLI engine NetCDF to Excel
+│   ├── demnas.py                  # Headless Indonesian DEMNAS fetcher
+│   └── ecmwf_era5.py              # CDS API automated ERA5 fetcher
 ├── hydro/                    # Modul struktur tiang Delft3D & MIKE 21
 │   ├── delft3d_pile.py
 │   └── mike21_pile.py
@@ -156,11 +177,18 @@ ocean-engineering-toolkit/
 │   ├── cards.py
 │   └── runner.py
 ├── examples/                 # Contoh file input & hasil tes
-├── cli.py                    # Antarmuka CLI utama
+├── cli.py                    # Antarmuka CLI utama terpadu
 ├── requirements.txt          # Daftar dependencies Python
 ├── LICENSE                   # Lisensi open-source MIT
 └── README.md                 # Dokumentasi proyek
 ```
+
+---
+
+## 👨‍💻 Author
+Dikembangkan oleh **Aswal Ikraam Aritonang**  
+GitHub: [@Asikraam](https://github.com/Asikraam)  
+Email: [aswal.space@gmail.com](mailto:aswal.space@gmail.com)
 
 ---
 
