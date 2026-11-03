@@ -1,48 +1,60 @@
 # Ocean Engineering Toolkit
 
-A modular Python automation toolkit developed for ocean, coastal, and offshore engineering workflows. Eliminates repetitive manual tasks across structural modeling, hydrodynamic boundary setup, metocean reanalysis extraction, and report graphic preparation.
+[![Download ZIP](https://img.shields.io/badge/Download-ZIP_Source_Code-2ea44f?style=for-the-badge&logo=github)](https://github.com/Asikraam/ocean-engineering-toolkit/archive/refs/heads/main.zip)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey?style=for-the-badge)](https://github.com/Asikraam/ocean-engineering-toolkit)
+
+Kumpulan skrip dan modul automasi Python praktis untuk menunjang pekerjaan **Ocean, Coastal, and Offshore Engineering**. Didesain untuk mempercepat alur kerja harian: dari konversi gambar grafik teknis resolusi tinggi, penarikan data batimetri/metocean tanpa browser, hingga generator model struktur Bentley SACS dan pemodelan numerik Delft3D / MIKE 21.
+
+> [!TIP]
+> **Tidak punya akun GitHub?** Kamu tidak perlu login sama sekali. Cukup klik tombol hijau **[Download ZIP Source Code](https://github.com/Asikraam/ocean-engineering-toolkit/archive/refs/heads/main.zip)** di atas untuk langsung mengunduh seluruh file ke komputermu.
 
 ---
 
-## Capabilities
+## 🗺️ Alur Kerja & Arsitektur Modul
 
-| Domain | Module | Description |
-| :--- | :--- | :--- |
-| **Graphics & Reporting** | `converters` | High-DPI rasterization (300+ DPI) for SACS vector graphics (`.wmf`/`.emf`) and multi-page technical report PDFs (`.pdf` to `.png`). |
-| **Metocean & Bathymetry** | `metocean` | Headless DEMNAS bathymetry tile fetcher via geographic bounding boxes, and automated ECMWF ERA5 wave/wind reanalysis extraction via Copernicus CDS API. |
-| **Hydrodynamic Modeling** | `hydro` | Automated marine pile layouts, porous plate loss coefficient calculation, and boundary cards for Delft3D FLOW (`.thd`) and DHI MIKE 21 HD. |
-| **Offshore Structures** | `sacs` | Strictly compliant 80-column fixed-format card generation (`sacinp.*`), parametric jacket geometry synthesis, and detached process launcher for Bentley SACS Executive & Precede. |
+```mermaid
+flowchart TD
+    subgraph INPUT ["Input Teknis & Koordinat"]
+        A["File SACS (.wmf / .emf / .pdf)"]
+        B["Koordinat BBox Wilayah (Lon, Lat)"]
+        C["Tata Letak Tiang Pancang (X, Y, Dia)"]
+        D["Parameter Geometri Jacket"]
+    end
 
----
+    subgraph TOOLKIT ["Ocean Engineering Toolkit"]
+        M1["converters/<br>High-DPI Vector Rasterizer"]
+        M2["metocean/<br>Headless DEMNAS & ERA5 Fetcher"]
+        M3["hydro/<br>Delft3D & MIKE 21 Structure Engine"]
+        M4["sacs/<br>80-Column Card Generator & Launcher"]
+    end
 
-## Project Structure
+    subgraph OUTPUT ["Output Siap Pakai"]
+        O1["Gambar PNG Tajam 300+ DPI (Word/LaTeX)"]
+        O2["Batimetri XYZ & Reanalisis Gelombang .nc"]
+        O3["Thin Dam .thd & Pile Resistance MIKE 21"]
+        O4["Input Model sacinp.* & SACS Precede 3D"]
+    end
 
+    A --> M1 --> O1
+    B --> M2 --> O2
+    C --> M3 --> O3
+    D --> M4 --> O4
 ```
-ocean-engineering-toolkit/
-├── converters/
-│   ├── wmf_converter.py      # Windows GDI+ / Pillow vector to PNG rasterizer
-│   └── pdf_converter.py      # High-performance PDFium multi-page renderer
-├── metocean/
-│   ├── demnas.py             # Headless BIG DEMNAS tile downloader & XYZ exporter
-│   └── ecmwf_era5.py         # Copernicus CDS API automated wave & wind fetcher
-├── hydro/
-│   ├── delft3d_pile.py       # Thin dam & porous plate loss generator
-│   └── mike21_pile.py        # MIKE 21 ASCII pile resistance card generator
-├── sacs/
-│   ├── cards.py              # 80-column card generator (JOINT, MEMBER, SECT)
-│   └── runner.py             # Detached WMI launcher for Precede & SACS Executive
-├── cli.py                    # Unified command-line interface
-├── requirements.txt
-├── LICENSE
-└── README.md
-```
 
 ---
 
-## Installation
+## 📥 Panduan Unduh & Akses (Untuk Semua Orang)
 
-Clone the repository and install the dependencies:
+Repositori ini bersifat **100% Publik**. Siapapun di seluruh dunia bisa mengakses dan menyalin kodenya secara bebas tanpa perlu login:
 
+### Cara 1: Unduh Langsung via Browser (Tanpa Akun GitHub)
+1. Klik tombol **[Download ZIP](https://github.com/Asikraam/ocean-engineering-toolkit/archive/refs/heads/main.zip)** di bagian atas halaman ini (atau klik tombol hijau `<> Code` di kanan atas lalu pilih **Download ZIP**).
+2. Ekstrak file zip di komputermu.
+3. Seluruh skrip Python langsung siap dijalankan!
+
+### Cara 2: Clone via Terminal (Untuk Pengguna Git)
 ```bash
 git clone https://github.com/Asikraam/ocean-engineering-toolkit.git
 cd ocean-engineering-toolkit
@@ -51,86 +63,107 @@ pip install -r requirements.txt
 
 ---
 
-## Command Line Usage
+## ⚡ Quick Start: 4 Perintah Paling Sering Digunakan
 
-All core modules are accessible through the unified `cli.py` interface.
-
-### 1. Convert SACS Precede Vector Graphics (.wmf) to PNG
-Converts `.wmf` graphics exported from Bentley SACS Precede to crisp 300 DPI PNG images for Word or LaTeX reports:
+Semua fungsi dapat dipanggil langsung melalui antarmuka perintah terpadu `cli.py`:
 
 ```bash
-# Single file
-python cli.py wmf2png sacs_plot.wmf --dpi 300 -o sacs_plot.png
+# 1. Ubah grafik plot SACS/Precede (.wmf) jadi PNG tajam 300 DPI untuk laporan
+python cli.py wmf2png gambar_sacs.wmf --dpi 300
 
-# Batch convert an entire directory of plots
-python cli.py wmf2png ./sacs_plots/ --dpi 300
+# 2. Download tile batimetri DEMNAS otomatis via koordinat tanpa buka Chrome
+python cli.py demnas --bbox 106.6 -6.1 107.0 -5.8
+
+# 3. Hitung susunan tiang pancang & koefisien hambatan Delft3D FLOW
+python cli.py delft-pile --nx 4 --ny 6 --dx 5.0 --dy 5.0 --dia 1.2
+
+# 4. Generate kartu SACS 3-Leg Tripod Jacket otomatis
+python cli.py sacs-tripod --depth 45.0 --airgap 12.0
 ```
 
-### 2. Convert Calculation Sheets & Drawings (PDF to PNG)
+---
+
+## 📚 Rincian Modul & Cara Pakai Lengkap
+
+### 1. Document & Graphic Converters (`converters/`)
+Mengatasi masalah klasik grafik buram saat mengekspor visualisasi dari Bentley SACS / Precede ke dokumen Microsoft Word atau LaTeX:
+- **`wmf_converter.py`**: Menggunakan Windows GDI+ untuk merasterisasi file `.wmf` dan `.emf` menjadi PNG berkualitas publikasi (300 hingga 600 DPI) tanpa pecah/pixelated.
+- **`pdf_converter.py`**: Merasterisasi gambar teknik PDF per halaman secara cepat menggunakan Chromium PDFium engine.
+
 ```bash
-python cli.py pdf2png structural_drawing.pdf --dpi 300 -o ./output_images/
+# Mengonversi seluruh isi folder berisi banyak file .wmf sekaligus:
+python cli.py wmf2png ./folder_grafik_sacs/ --dpi 300
+
+# Mengonversi laporan drawing PDF ke gambar PNG:
+python cli.py pdf2png drawing_pelabuhan.pdf --dpi 300 -o ./output_gambar/
 ```
 
-### 3. Headless DEMNAS Bathymetry Downloader
-Downloads all Indonesian National Elevation (DEMNAS) tiles intersecting a bounding box (`min_lon min_lat max_lon max_lat`) without manual web browser navigation:
+---
+
+### 2. Metocean & Bathymetry Fetcher (`metocean/`)
+Mengambil data oseanografi dan elevasi langsung ke disk tanpa proses klik manual di web:
+- **`demnas.py`**: Menghitung Nomor Lembar Peta (NLP skala 1:50.000) berdasarkan bounding box koordinat geodetik, mengunduh tile DEMNAS secara *headless*, dan mengekspornya ke format ASCII XYZ (`.xyz`) untuk mesh pemodelan.
+- **`ecmwf_era5.py`**: Menghubungkan script ke Copernicus Climate Data Store (CDS API) untuk menarik data historis tinggi gelombang signifikan ($H_s$), periode ($T_p$), arah gelombang, dan angin 10 meter ($u_{10}, v_{10}$) dalam format NetCDF (`.nc`).
 
 ```bash
-python cli.py demnas --bbox 106.6 -6.1 107.0 -5.8 -o ./demnas_tiles/
+# Menarik DEMNAS untuk wilayah pesisir tertentu:
+python cli.py demnas --bbox 106.5 -6.2 107.0 -5.8 -o ./demnas_tiles/
+
+# Menarik gelombang ERA5 satu bulan penuh:
+python cli.py era5 --years 2023 --months 1 --bbox 5.0 95.0 -11.0 141.0 -o era5_waves.nc
 ```
 
-### 4. Fetch ECMWF ERA5 Ocean Wave & Wind Reanalysis
-Pulls significant wave height ($H_s$), peak wave period ($T_p$), and 10-meter wind fields directly via CDS API:
+---
+
+### 3. Hydrodynamic Modeling Helper (`hydro/`)
+Otomasi definisi batas struktur penghalang untuk software pemodelan hidrodinamika pantai:
+- **`delft3d_pile.py`**: Menghitung koefisien rugi-daya (*quadratic energy loss coefficient*, $c_{loss}$) untuk barisan tiang pancang (dermaga/jacket) yang direpresentasikan sebagai *porous plate* di Delft3D FLOW, serta membuat file *thin dam* (`.thd`).
+- **`mike21_pile.py`**: Menghasilkan file spesifikasi tahanan tiang pancang ASCII untuk modul DHI MIKE 21 HD FM.
 
 ```bash
-python cli.py era5 --years 2023 --months 1 2 --bbox 5.0 95.0 -11.0 141.0 -o era5_waves.nc
-```
-*(Requires `~/.cdsapirc` Copernicus API key).*
-
-### 5. Generate Delft3D Pile Structure & Equivalent Head Loss
-Calculates pile coordinates and the equivalent quadratic energy loss coefficient ($c_{loss}$) for porous plates:
-
-```bash
-python cli.py delft-pile --nx 4 --ny 6 --dx 5.0 --dy 5.0 --dia 1.2 -o jetty_piles.csv
+# Format pemakaian untuk konfigurasi 4x6 tiang:
+python cli.py delft-pile --nx 4 --ny 6 --dx 5.0 --dy 5.0 --dia 1.2 -o piles.csv
 ```
 
-### 6. Generate SACS Parametric 3-Leg Tripod Jacket Input
-Synthesizes a complete 80-column fixed-format `sacinp.tripod` model file:
+---
+
+### 4. SACS Offshore Automation (`sacs/`)
+Otomasi pra-proses analisis struktur lepas pantai:
+- **`cards.py`**: Generator kartu 80-kolom fixed-format (`JOINT`, `MEMBER`, `SECT`, `PGRP`) standar SACS 2025.
+- **`runner.py`**: Menjalankan Bentley SACS Executive dan membuka Precede 3D modeler secara aman tanpa risiko auto-close.
 
 ```bash
-python cli.py sacs-tripod --depth 45.0 --airgap 12.0 --base-rad 14.0 --top-rad 6.5 -o sacinp.tripod
-```
-
-### 7. Launch Bentley SACS Precede (Detached)
-Opens 3D Precede safely via Windows WMI to prevent process termination:
-
-```bash
+# Buka SACS Precede langsung dari terminal:
 python cli.py sacs-precede
 ```
 
 ---
 
-## Python API Example
+## 📂 Struktur Repositori
 
-```python
-from hydro import calculate_porous_loss_coefficient, generate_pile_group_layout
-from sacs import build_tripod_jacket_sacinp
-
-# 1. Compute hydrodynamic loss for a row of piles (D=1.2m, Spacing=4.8m)
-loss_coeff = calculate_porous_loss_coefficient(diameter_m=1.2, spacing_m=4.8)
-print(f"Delft3D Porous Plate Loss Coefficient: {loss_coeff}")
-
-# 2. Build SACS 3-Leg Tripod Model
-build_tripod_jacket_sacinp(
-    base_radius_m=15.0,
-    top_radius_m=7.0,
-    water_depth_m=50.0,
-    air_gap_m=14.0,
-    output_path="sacinp.tripod"
-)
+```
+ocean-engineering-toolkit/
+├── converters/               # Modul konversi grafis & dokumen
+│   ├── wmf_converter.py
+│   └── pdf_converter.py
+├── metocean/                 # Modul unduh DEMNAS & ECMWF ERA5
+│   ├── demnas.py
+│   └── ecmwf_era5.py
+├── hydro/                    # Modul struktur tiang Delft3D & MIKE 21
+│   ├── delft3d_pile.py
+│   └── mike21_pile.py
+├── sacs/                     # Modul kartu SACS & runner
+│   ├── cards.py
+│   └── runner.py
+├── examples/                 # Contoh file input & hasil tes
+├── cli.py                    # Antarmuka CLI utama
+├── requirements.txt          # Daftar dependencies Python
+├── LICENSE                   # Lisensi open-source MIT
+└── README.md                 # Dokumentasi proyek
 ```
 
 ---
 
-## License
+## 📄 Lisensi
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Didistribusikan di bawah Lisensi MIT. Siapapun bebas menggunakan, menyalin, dan memodifikasi untuk keperluan riset maupun pekerjaan profesional. Lihat file [LICENSE](LICENSE) untuk ketentuan lengkap.
