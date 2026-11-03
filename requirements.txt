@@ -1,0 +1,11 @@
+# Core Scientific & Numerical
+numpy>=1.24.0
+scipy>=1.10.0
+requests>=2.31.0
+
+# Document & Graphic Rasterization
+Pillow>=10.0.0
+pypdfium2>=4.20.0
+
+# Metocean & Spatial Data
+cdsapi>=0.7.0

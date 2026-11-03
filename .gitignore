@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+
+# Environment Variables & API Secrets
+.env
+.cdsapirc
+*.secret
+
+# Geospatial & Metocean Data (Large binaries)
+*.nc
+*.tif
+*.tiff
+*.geotiff
+*.dep
+*.xyz
+*.grd
+demnas_tiles/
+
+# SACS Output files
+*.runx
+*.listing
+*.db
+*.mpf
+*.pst
+
+# IDE
+.vscode/
+.idea/
+*.swp

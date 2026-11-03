@@ -1,0 +1,23 @@
+SACS 2025 PARAMETRIC TRIPOD JACKET AUTOMATION                                   
+OPTIONS MN  CD     DY           YES                                             
+LDOPT   METRIC                                                                  
+PGRP   LEG    STEEL                                                             
+PGRP   HOR    STEEL                                                             
+SECT   LEG   120.00  3.500                                                      
+SECT   HOR    60.00  1.750                                                      
+JOINT   101  14.00   0.00 -45.00 111111                                         
+JOINT   102  -7.00  12.12 -45.00 111111                                         
+JOINT   103  -7.00 -12.12 -45.00 111111                                         
+JOINT   201   6.50   0.00  12.00                                                
+JOINT   202  -3.25   5.63  12.00                                                
+JOINT   203  -3.25  -5.63  12.00                                                
+MEMBER  101 201 LEG                                                             
+MEMBER  102 202 LEG                                                             
+MEMBER  103 203 LEG                                                             
+MEMBER  201 202 HOR                                                             
+MEMBER  202 203 HOR                                                             
+MEMBER  203 201 HOR                                                             
+MEMBER  101 102 HOR                                                             
+MEMBER  102 103 HOR                                                             
+MEMBER  103 101 HOR                                                             
+END                                                                             
