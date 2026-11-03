@@ -90,6 +90,26 @@ def main():
     # 13. wmf-gui
     subparsers.add_parser("wmf-gui", help="Launch dedicated WMF/EMF Vector Converter GUI")
 
+    # 14. mike-wave-dfs1
+    subparsers.add_parser("mike-wave-dfs1", help="Launch DHI MIKE 21 SW Spectral Wave Boundary DFS1 Generator GUI")
+
+    # 15. mike-wind-dfs2
+    subparsers.add_parser("mike-wind-dfs2", help="Launch DHI MIKE 21 Wind Forcing DFS2 Grid Generator GUI")
+
+    # 16. mike-pile-gui
+    subparsers.add_parser("mike-pile-gui", help="Launch DHI MIKE 21 Pile & Trestle Obstacle Generator GUI")
+
+    # 17. dxf2xyz
+    p_dxf = subparsers.add_parser("dxf2xyz", help="Convert AutoCAD DXF lines/polylines to MIKE ASCII XYZ boundary")
+    p_dxf.add_argument("--input", required=True, help="Input AutoCAD DXF file (.dxf)")
+    p_dxf.add_argument("-o", "--output", default="boundary.xyz", help="Output MIKE XYZ file path")
+    p_dxf.add_argument("--layer", default=None, help="Target drawing layer name (optional)")
+
+    # 18. dfsu-concat
+    p_cat = subparsers.add_parser("dfsu-concat", help="Concatenate multiple DHI MIKE 21 DFSU temporal simulation outputs")
+    p_cat.add_argument("--input-files", nargs="+", required=True, help="List of sequential DFSU files")
+    p_cat.add_argument("-o", "--output", required=True, help="Output merged DFSU file path")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -194,6 +214,29 @@ def main():
         script_path = curr_dir / "converters" / "WmfToPngConverterApp.py"
         subprocess.Popen([sys.executable, str(script_path)])
         print("[+] Launched WMF/EMF Vector to PNG Converter GUI.")
+
+    elif args.command == "mike-wave-dfs1":
+        script_path = curr_dir / "hydro" / "MikeConvertWaveDfs1App.py"
+        subprocess.Popen([sys.executable, str(script_path)])
+        print("[+] Launched MIKE 21 SW Wave Boundary DFS1 Generator GUI.")
+
+    elif args.command == "mike-wind-dfs2":
+        script_path = curr_dir / "hydro" / "MikeConvertWindDfs2App.py"
+        subprocess.Popen([sys.executable, str(script_path)])
+        print("[+] Launched MIKE 21 Wind Forcing DFS2 Grid Generator GUI.")
+
+    elif args.command == "mike-pile-gui":
+        script_path = curr_dir / "hydro" / "MikePileGeneratorApp.py"
+        subprocess.Popen([sys.executable, str(script_path)])
+        print("[+] Launched MIKE 21 Pile & Trestle Obstacle Generator GUI.")
+
+    elif args.command == "dxf2xyz":
+        from hydro import convert_dxf_to_xyz
+        convert_dxf_to_xyz(args.input, args.output, args.layer)
+
+    elif args.command == "dfsu-concat":
+        from hydro import merge_dfsu_files
+        merge_dfsu_files(args.input_files, args.output)
 
 
 if __name__ == "__main__":
