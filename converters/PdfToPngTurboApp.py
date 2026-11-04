@@ -97,15 +97,32 @@ class PDFToPNGTurboApp(tk.Tk):
         main_frame = tk.Frame(self, bg="#f8fafc", padx=20, pady=16)
         main_frame.pack(fill="both", expand=True)
 
-        # Header minimalis
+        # Header dengan Tombol Panduan
+        top_header = tk.Frame(main_frame, bg="#f8fafc")
+        top_header.pack(fill="x")
+
         lbl_title = tk.Label(
-            main_frame,
+            top_header,
             text="PDF to PNG Converter",
             font=("Segoe UI", 15, "bold"),
             bg="#f8fafc",
             fg="#0f172a"
         )
-        lbl_title.pack(anchor="w")
+        lbl_title.pack(side="left")
+
+        btn_tutorial = tk.Button(
+            top_header,
+            text="📖 Panduan & Tutorial",
+            font=("Segoe UI", 8, "bold"),
+            bg="#e2e8f0",
+            fg="#0f172a",
+            relief="flat",
+            padx=10,
+            pady=3,
+            cursor="hand2",
+            command=self.open_tutorial
+        )
+        btn_tutorial.pack(side="right")
 
         lbl_desc = tk.Label(
             main_frame,
@@ -303,6 +320,11 @@ class PDFToPNGTurboApp(tk.Tk):
             anchor="w"
         )
         self.lbl_status.pack(fill="x")
+
+    def open_tutorial(self):
+        """Buka panduan resmi tutorial penggunaan di browser."""
+        import webbrowser
+        webbrowser.open("https://github.com/Asikraam/ocean-engineering-toolkit/tree/main/converters#readme")
 
     def browse_pdf(self):
         files = filedialog.askopenfilenames(

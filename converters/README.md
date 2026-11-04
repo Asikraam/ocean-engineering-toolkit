@@ -9,6 +9,8 @@ A suite of production-grade desktop GUI applications designed for high-resolutio
 
 All tools in this directory are **100% self-contained standalone Python applications**. All rendering engines (Windows GDI+ vector rasterizer and PDF engines) are embedded internally—no external helper scripts or loose files are required.
 
+Setiap aplikasi dilengkapi tombol **"📖 Panduan & Tutorial"** di pojok kanan atas yang langsung terhubung ke dokumentasi ini.
+
 ---
 
 ## 🛠️ Applications Overview
@@ -38,6 +40,48 @@ python PdfToPngTurboApp.py
 
 ---
 
+## 📖 Panduan Penggunaan Langkah demi Langkah (Tutorial)
+
+### 🖼️ Tutorial 1: Konversi Grafik SACS / CAD (WMF & EMF ke PNG)
+
+Gunakan **`UniversalConverterApp.py`** (Tab *WMF & EMF*) atau **`WmfToPngConverterApp.py`**:
+
+1. **Pilih File Sumber:**
+   - Klik tombol **"Pilih File..."** untuk memilih satu atau beberapa file `.wmf` / `.emf`.
+   - Atau klik **"Pilih Folder..."** untuk mengonversi seluruh file dalam satu direktori secara sekaligus (*batch mode*).
+2. **Atur Kualitas & Resolusi:**
+   - **Skala Resolusi:** Pilih opsi **4x (Ultra HD)** untuk disisipkan ke laporan Microsoft Word / LaTeX, atau pilih **DPI Fisik (300 DPI)** untuk standar cetak dokumen teknik.
+3. **Pengaturan Background:**
+   - Pilih latar belakang: *Transparan*, *Putih*, atau *Hitam*.
+   - Centang opsi **"Key-Out Background Putih"** jika kamu ingin menghapus warna putih latar bawaan CAD/SACS agar gambar menjadi transparan.
+4. **Mulai Konversi:**
+   - Klik tombol **"Mulai Konversi WMF ke PNG"**.
+   - Hasil gambar `.png` otomatis disimpan di folder yang sama dengan file sumber.
+   - Klik tombol **"Buka Folder Hasil"** untuk langsung melihat gambar hasil konversi.
+
+---
+
+### 📄 Tutorial 2: Konversi Laporan & Drawing PDF ke PNG Tajam
+
+Gunakan **`UniversalConverterApp.py`** (Tab *PDF Converter*) atau **`PdfToPngTurboApp.py`**:
+
+1. **Pilih Dokumen PDF:**
+   - Klik **"Pilih File PDF..."** dan tentukan dokumen gambar teknik atau laporan yang ingin diekstrak halamannya.
+2. **Tentukan Resolusi (DPI):**
+   - **150 DPI:** Pratinjau cepat / penggunaan web.
+   - **300 DPI:** Standar dokumen laporan teknik resmi & publikasi jurnal (rekomendasi).
+   - **600 DPI:** Kualitas ultra-tinggi untuk drawing CAD bergaris sangat tipis (*fine-line vector*).
+3. **Filter Halaman (Opsional):**
+   - Biarkan bertuliskan `all` untuk mengonversi seluruh halaman dokumen.
+   - Atau ketik halaman tertentu saja, misalnya: `1, 3-5, 10` untuk hanya mengambil halaman 1, 3, 4, 5, dan 10.
+4. **Ekspor ZIP Otomatis (Opsional):**
+   - Centang **"Export as ZIP Package"** jika kamu ingin seluruh file gambar PNG langsung dikemas dalam 1 arsip `.zip`.
+5. **Mulai Ekstraksi:**
+   - Klik **"Mulai Konversi PDF"**.
+   - Mesin berjalan secara *asynchronous* sehingga jendela aplikasi tetap responsif.
+
+---
+
 ## 🏗️ Technical Architecture & Engine Design
 
 ```
@@ -45,7 +89,7 @@ converters/
 ├── UniversalConverterApp.py    # All-in-one dual-tab GUI (Vector & PDF)
 ├── WmfToPngConverterApp.py     # Standalone SACS/CAD vector metafile converter
 ├── PdfToPngTurboApp.py         # Multi-threaded turbo PDF rasterizer
-└── README.md                   # Technical documentation
+└── README.md                   # Technical documentation & tutorials
 ```
 
 ### 1. Vector Metafile Engine (WMF / EMF)

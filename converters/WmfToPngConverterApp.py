@@ -376,6 +376,11 @@ class WmfToPngApp(tk.Tk):
         self.style = ttk.Style(self)
         self.style.theme_use("clam")
 
+    def open_tutorial(self):
+        """Buka panduan resmi tutorial penggunaan di browser."""
+        import webbrowser
+        webbrowser.open("https://github.com/Asikraam/ocean-engineering-toolkit/tree/main/converters#readme")
+
     def toggle_theme(self):
         """Beralih antara Mode Terang dan Gelap."""
         self.is_dark = not self.is_dark
@@ -417,6 +422,18 @@ class WmfToPngApp(tk.Tk):
             cursor="hand2"
         )
         self.btn_theme.pack(side="right")
+
+        self.btn_tutorial = tk.Button(
+            self.header_frame,
+            text="📖 Panduan & Tutorial",
+            command=self.open_tutorial,
+            font=("Segoe UI", 8, "bold"),
+            relief="flat",
+            padx=10,
+            pady=4,
+            cursor="hand2"
+        )
+        self.btn_tutorial.pack(side="right", padx=(0, 8))
 
         # Garis pemisah header
         self.sep_header = tk.Frame(self, height=1)
@@ -643,6 +660,15 @@ class WmfToPngApp(tk.Tk):
             highlightbackground=self.c_btn_s_bdr,
             highlightthickness=1
         )
+        if hasattr(self, "btn_tutorial"):
+            self.btn_tutorial.configure(
+                bg=self.c_btn_s_bg,
+                fg=self.c_btn_s_fg,
+                activebackground=self.c_btn_s_act,
+                activeforeground=self.c_btn_s_fg,
+                highlightbackground=self.c_btn_s_bdr,
+                highlightthickness=1
+            )
 
         self.sep_header.configure(bg=self.c_border)
 

@@ -461,6 +461,11 @@ class UniversalConverterApp(tk.Tk):
                                    cursor="hand2", command=self.toggle_theme)
         self.btn_theme.pack(side="right")
 
+        self.btn_tutorial = tk.Button(top_bar, text="📖 Panduan & Tutorial",
+                                      font=("Segoe UI", 9, "bold"), bd=1, relief="solid", padx=12, pady=2,
+                                      cursor="hand2", command=self.open_tutorial)
+        self.btn_tutorial.pack(side="right", padx=(0, 8))
+
         # Tab Notebook
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill="both", expand=True, padx=20, pady=(0, 15))
@@ -636,6 +641,11 @@ class UniversalConverterApp(tk.Tk):
     # =========================================================================
     # THEME ENGINE
     # =========================================================================
+    def open_tutorial(self):
+        """Buka panduan resmi tutorial penggunaan di browser."""
+        import webbrowser
+        webbrowser.open("https://github.com/Asikraam/ocean-engineering-toolkit/tree/main/converters#readme")
+
     def toggle_theme(self):
         self.is_dark = not self.is_dark
         self.setup_theme_palette()
