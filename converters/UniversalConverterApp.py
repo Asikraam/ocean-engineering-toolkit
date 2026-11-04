@@ -1,3 +1,26 @@
+"""
+# Universal Graphic & Document Converter Studio
+
+All-in-one desktop GUI application for high-resolution graphics and document conversion:
+- **Tab 1: Vector Metafiles (WMF / EMF)** -> Lossless Ultra-HD PNG via Windows GDI+ engine.
+- **Tab 2: PDF Documents & Drawings** -> Crystal-clear PNG (single file or batch folder, page ranges, ZIP export).
+
+## Features
+- **100% Standalone**: Self-contained rendering engine with zero external script dependencies.
+- **Auto Dark / Light Theme**: Detects Windows system theme with manual toggle option.
+- **DPI Control**: 150 DPI (Fast), 200 DPI (Sharp), 300 DPI (Print/Thesis), 600 DPI (Ultra-HD CAD).
+- **Custom Output Folder**: Flexible destination selector with auto-folder creation.
+- **Real-Time Progress**: Live page-by-page progress bar and percentage status.
+
+## Quickstart
+```bash
+python UniversalConverterApp.py
+```
+
+## Author
+**Aswal Ikraam Aritonang** ([@Asikraam](https://github.com/Asikraam))
+"""
+
 import os
 import sys
 import time

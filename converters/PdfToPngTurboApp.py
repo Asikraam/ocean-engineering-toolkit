@@ -392,6 +392,7 @@ class PDFToPNGTurboApp(tk.Tk):
                     tot = len(doc)
                     pages_to_convert = parse_page_numbers(page_filter, tot)
                     num_pages = len(pages_to_convert)
+                    scale = dpi / 72.0
 
                     self.prog_bar["maximum"] = num_pages
                     self.prog_bar["value"] = 0
@@ -414,6 +415,7 @@ class PDFToPNGTurboApp(tk.Tk):
                     tot = len(doc)
                     pages_to_convert = parse_page_numbers(page_filter, tot)
                     num_pages = len(pages_to_convert)
+                    scale = dpi / 72.0
 
                     self.prog_bar["maximum"] = num_pages
                     self.prog_bar["value"] = 0
