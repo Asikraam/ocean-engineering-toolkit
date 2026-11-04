@@ -1,46 +1,77 @@
-# 🖼️ Engineering Document & Graphic Converters
+# Graphic & Document Converters Studio
 
-Koleksi aplikasi desktop berbasis antarmuka grafis (**GUI**) dan mesin render vektor berkecepatan tinggi untuk menghasilkan gambar teknik beresolusi tinggi (300–600 DPI) siap cetak dan laporan.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![GUI: Tkinter](https://img.shields.io/badge/GUI-Tkinter%20Native-0284c7?style=for-the-badge)](https://docs.python.org/3/library/tkinter.html)
+[![DPI Control](https://img.shields.io/badge/Resolution-Up%20to%20600%20DPI-10b981?style=for-the-badge)](https://github.com/Asikraam/ocean-engineering-toolkit)
+[![Standalone](https://img.shields.io/badge/Design-100%25%20Self--Contained-8b5cf6?style=for-the-badge)](https://github.com/Asikraam/ocean-engineering-toolkit)
 
-> [!IMPORTANT]
-> **PERINGATAN WAJIB: Jangan Hapus atau Pisahkan `ConvertWmfToPng.ps1`!**  
-> File `.ps1` ini adalah **mesin backend wajib**. Jika kamu menyalin atau memindahkan file aplikasi Python (`UniversalConverterApp.py` atau `WmfToPngConverterApp.py`), **pastikan file `ConvertWmfToPng.ps1` selalu berada di satu folder yang sama**. Tanpa file ini, fitur konversi vektor WMF/EMF akan error karena program Python memanggilnya secara otomatis di balik layar.
+A suite of production-grade desktop GUI applications designed for high-resolution graphics and technical drawing rasterization. Tailored for ocean, civil, and offshore engineering workflows to produce publication-ready figures (300–600 DPI) for reports and journal manuscripts.
 
----
-
-## 🚀 Perbandingan & Pilihan Aplikasi
-
-Folder ini menyediakan 3 varian aplikasi desktop sesuai kebutuhan kerja:
-
-| Aplikasi | Format Input | Format Output | Antarmuka | Fitur Unggulan | Status Wajib |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **`UniversalConverterApp.py`** ⭐ *(All-in-One)* | `.wmf`, `.emf`, `.pdf` | `.png` | GUI Dual-Tab | Aplikasi terpadu untuk semua jenis konversi grafis & dokumen dalam 1 jendela | Program Utama |
-| **`WmfToPngConverterApp.py`** | `.wmf`, `.emf` | `.png` | GUI Dedicated | Khusus grafik vektor SACS Precede & CAD, kontrol DPI (72–600), background transparan | Program Utama |
-| **`PdfToPngTurboApp.py`** | `.pdf` | `.png` | GUI Dedicated | Khusus gambar teknik & laporan PDF, ekstraksi multi-halaman cepat, auto-ZIP | Program Utama |
-| **`ConvertWmfToPng.ps1`** ⚠️ | `.wmf`, `.emf` | `.png` | CLI Engine | Mesin render native Windows GDI+ di background | **Wajib Ada di Folder** |
+All tools in this directory are **100% self-contained standalone Python applications**. All rendering engines (Windows GDI+ vector rasterizer and PDF engines) are embedded internally—no external helper scripts or loose files are required.
 
 ---
 
-## 💻 Cara Menjalankan Aplikasi
+## 🛠️ Applications Overview
 
-Pastikan Python dan dependensi pendukung sudah terpasang:
+| Application | Input Formats | Target Output | Interface | Key Capabilities |
+| :--- | :--- | :--- | :--- | :--- |
+| **`UniversalConverterApp.py`**<br>`⭐ Flagship All-in-One` | `.wmf`, `.emf`, `.pdf` | High-DPI `.png` | Dual-Tab Desktop GUI | Unified converter for both CAD/SACS vector plots and multi-page PDF technical drawings in a single window. Auto-theme detection (Dark/Light). |
+| **`WmfToPngConverterApp.py`**<br>`Dedicated Vector Studio` | `.wmf`, `.emf` | Lossless `.png` | Desktop GUI | Specially tuned for Bentley SACS, Precede, and AutoCAD vector metafiles. Hardware GDI+ bicubic anti-aliasing, scale factor up to 10x, and transparent background keying. |
+| **`PdfToPngTurboApp.py`**<br>`Turbo Document Extractor` | `.pdf` | 300+ DPI `.png` | Desktop GUI | Multi-threaded asynchronous PDF renderer. Supports custom page ranges (`1, 3-5, 8`), batch directory processing, and automated ZIP packaging. |
+
+---
+
+## ⚡ Quickstart
+
+Launch any converter directly using standard Python:
 
 ```bash
-# 1. Install dependensi grafis
-pip install pillow pymupdf pypdfium2
-
-# 2. Jalankan aplikasi pilihanmu:
+# 1. Flagship All-in-One Studio (Vector + PDF)
 python UniversalConverterApp.py
-# ATAU
+
+# 2. Dedicated SACS / CAD Vector Converter
 python WmfToPngConverterApp.py
-# ATAU
+
+# 3. Dedicated PDF Document & Drawing Extractor
 python PdfToPngTurboApp.py
 ```
 
 ---
 
-## ⚙️ Mengapa Ada File `ConvertWmfToPng.ps1`?
+## 🏗️ Technical Architecture & Engine Design
 
-File `ConvertWmfToPng.ps1` adalah **mesin render native Windows GDI+**. 
+```
+converters/
+├── UniversalConverterApp.py    # All-in-one dual-tab GUI (Vector & PDF)
+├── WmfToPngConverterApp.py     # Standalone SACS/CAD vector metafile converter
+├── PdfToPngTurboApp.py         # Multi-threaded turbo PDF rasterizer
+└── README.md                   # Technical documentation
+```
 
-Aplikasi Python `WmfToPngConverterApp.py` dan `UniversalConverterApp.py` memanggil skrip ini di balik layar untuk memastikan garis vektor halus, teks grafik tidak terdistorsi, dan warna grafik dari Bentley SACS / AutoCAD terkonversi secara presisi tanpa garis putus-putus.
+### 1. Vector Metafile Engine (WMF / EMF)
+- **Engine:** Native Windows GDI+ subsystem with `HighQualityBicubic` interpolation and `ClearTypeGridFit` text rendering.
+- **Self-Contained:** The GDI+ rendering pipeline is fully embedded within the Python scripts. When executed on any Windows machine, the engine is initialized dynamically from memory, eliminating loose script dependencies.
+- **Fidelity:** Prevents broken line joints, vanishing thin structural member axes, and distorted CAD font annotations typical of generic converters.
+
+### 2. PDF Rendering Engine (PDF to PNG)
+- **Dual Backend:** Automatically prioritizes `pypdfium2` (Chromium PDFium) or `PyMuPDF` (`fitz`) depending on local availability.
+- **Zero-Block Initialization:** Applications launch instantaneously without triggering blocking background installations.
+- **Thread Safety:** Rasterization runs on dedicated background worker threads with thread-safe Tkinter idle task dispatching, preventing GUI lockup during large batch operations.
+
+---
+
+## 📦 Dependencies
+
+Install dependencies via pip:
+
+```bash
+pip install pillow pypdfium2
+```
+
+*(Optional: `pip install pymupdf` for alternative high-speed PDF backend).*
+
+---
+
+## 📄 License
+
+Part of the **Ocean Engineering Toolkit**, distributed under the MIT License.

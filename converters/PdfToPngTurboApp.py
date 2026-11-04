@@ -39,9 +39,12 @@ from tkinter import ttk, filedialog, messagebox
 try:
     import pymupdf
 except ImportError:
-    import subprocess
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pymupdf", "pillow"])
-    import pymupdf
+    pymupdf = None
+
+try:
+    import pypdfium2 as pdfium
+except ImportError:
+    pdfium = None
 
 
 def parse_page_numbers(page_str: str, total_pages: int) -> list[int]:
@@ -361,31 +364,51 @@ class PDFToPNGTurboApp(tk.Tk):
                 target_dir.mkdir(parents=True, exist_ok=True)
                 all_target_dirs.append(target_dir)
 
-                doc = pymupdf.open(str(pdf_file))
-                tot = len(doc)
-                pages_to_convert = parse_page_numbers(page_filter, tot)
-                num_pages = len(pages_to_convert)
-
-                self.prog_bar["maximum"] = num_pages
-                self.prog_bar["value"] = 0
-
                 saved_files = []
-                for i, page_idx in enumerate(pages_to_convert, start=1):
-                    self.lbl_status.config(
-                        text=f"Memproses {pdf_file.name}: halaman {page_idx + 1} dari {tot}...",
-                        fg="#2563eb"
-                    )
-                    page = doc[page_idx]
-                    
-                    pix = page.get_pixmap(dpi=dpi, alpha=False, annots=False)
-                    out_path = target_dir / f"Page_{page_idx + 1:03d}.png"
-                    pix.save(str(out_path))
-                    saved_files.append(out_path)
-                    
-                    pix = None
-                    self.prog_bar["value"] = i
+                if pymupdf:
+                    doc = pymupdf.open(str(pdf_file))
+                    tot = len(doc)
+                    pages_to_convert = parse_page_numbers(page_filter, tot)
+                    num_pages = len(pages_to_convert)
 
-                doc.close()
+                    self.prog_bar["maximum"] = num_pages
+                    self.prog_bar["value"] = 0
+
+                    for i, page_idx in enumerate(pages_to_convert, start=1):
+                        self.lbl_status.config(
+                            text=f"Memproses {pdf_file.name}: halaman {page_idx + 1} dari {tot}...",
+                            fg="#2563eb"
+                        )
+                        page = doc[page_idx]
+                        pix = page.get_pixmap(dpi=dpi, alpha=False, annots=False)
+                        out_path = target_dir / f"Page_{page_idx + 1:03d}.png"
+                        pix.save(str(out_path))
+                        saved_files.append(out_path)
+                        pix = None
+                        self.prog_bar["value"] = i
+                    doc.close()
+                elif pdfium:
+                    doc = pdfium.PdfDocument(str(pdf_file))
+                    tot = len(doc)
+                    pages_to_convert = parse_page_numbers(page_filter, tot)
+                    num_pages = len(pages_to_convert)
+
+                    self.prog_bar["maximum"] = num_pages
+                    self.prog_bar["value"] = 0
+
+                    for i, page_idx in enumerate(pages_to_convert, start=1):
+                        self.lbl_status.config(
+                            text=f"Memproses {pdf_file.name}: halaman {page_idx + 1} dari {tot}...",
+                            fg="#2563eb"
+                        )
+                        page = doc.get_page(page_idx)
+                        bmp = page.render(scale=scale)
+                        pil_img = bmp.to_pil()
+                        out_path = target_dir / f"Page_{page_idx + 1:03d}.png"
+                        pil_img.save(out_path, "PNG", dpi=(dpi, dpi))
+                        saved_files.append(out_path)
+                        self.prog_bar["value"] = i
+                    doc.close()
                 total_pages_all += num_pages
 
                 if make_zip and saved_files:
